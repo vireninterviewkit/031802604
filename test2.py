@@ -11,11 +11,13 @@ for a in f :
         res[b]+=int(c)
     else:
         res[b]=int(c)
-    if(res[b]>1500):
+    if(res[b]>=1500):
         out.append(b)
 
 f.close()
 f = open("output.txt","w")
+i=len(out)
+f.write(str(i)+"\n")
 for i in out:
     f.write(i+"\n")
 f.close()
