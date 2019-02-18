@@ -8,7 +8,7 @@ import heapq
 
 import math
 
-
+from queue import Queue
 
 
 
@@ -36,7 +36,7 @@ class CountMinSketch():
 
 
 
-    def __init__(self, w, d, max=100000):
+    def __init__(self, w, d, max=100000): #num为存下的数。
 
         """
 
@@ -155,14 +155,6 @@ class CountMinSketch():
         :raises ValueError: if a negative value for 'count' is given.
 
         """
-
-        if count < 0:
-
-            raise ValueError(
-
-                'Cannot add negative count value in sketch for item: ' +
-
-                str(item))
 
         self._n += count
 
@@ -333,67 +325,25 @@ class CountMinSketch():
 
         return self._n
 
-    def resdic(self):
-        max=self._max
-        m=self.heavyHitters()
-        res=[]
-        for i in m:
-            try:
-                if m[i][0]>max:
-                    res.append(i)
-            except:
-                continue
-        return res
+    def test(self,item):
+        if self.estimate(item) > self._max :
+            return True
+        else :
+            return False
 
 
+q=Queue(50)
+cmk=CountMinSketch(10,10)
+for i in range(50):
+    q.put(["256.0.0.0",0])
+    cmk.update("256.0.0.0",0)
 
-
-
-class CountMinSketchUsingEpsAndDelta(CountMinSketch):
-
-
-
-    def __init__(self, eps, delta):
-
-        """
-
-        Initialize a Count-Min Sketch using epsilon and delta parameters.
-
-
-
-        2/w = eps ; w = 2/eps
-
-        1/2^depth <= 1-confidence ; depth >= log_{1/2} (1-confidence)
-
-
-
-        :param eps: an error at most of epsilon (of the total count) from the
-
-            true frequency of a query.
-
-        :type eps: float
-
-
-
-        :param delta: the probability of the error for a query = confidence.
-
-        :type delta: float
-
-        """
-
-        w = int(math.ceil(1 / eps))
-
-        d = int(math.ceil(math.log(1 - delta, base=0.5)))
-
-        super(CountMinSketchUsingEpsAndDelta, self).__init__(w, d)
-
-
-dic1=CountMinSketch(50,50)
-req=open("Request.txt","r")
-for i in req:
-    c,d=i.split()
-    d=int(d)
-    a,b=c.split(">")
-    dic1.update(a,d)
-print (dic1.heavyHitters())
-print (dic1.resdic())
+a=["110.120.119.114",2001]#设为新进入的值
+while 1 :
+    #a=XXXXXXX  ——未来进来值时使用
+    m=q.get()       #舍弃新值
+    q.put(a)        #获得新值
+    cmk.update(m[0], -m[1])     #舍弃旧值
+    cmk.update(a[0], a[1])      #获得新值
+    if cmk.test(a[0]) :
+        print(a[0]+"有问题")  #输出问题题目
